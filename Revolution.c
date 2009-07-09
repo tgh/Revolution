@@ -85,26 +85,36 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port, LADS
 
 
 /*
- *
+ * Here is where the rubber hits the road.  The actual sound manipulation
+ * is done in run().  For Revolution, it merely takes each input sample, and
+ * cuts it off at 0.67 (or -0.67) if it is above or below those thresholds,
+ * thus "squaring off" the curved wave which produces distortion.
  */
 void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 {
-	LADSPA_Data * input;
-	LADSPA_Data * output;
-	Revolution * revolution;
-	unsigned long i;
+	LADSPA_Data * input;			// to point to the input stream
+	LADSPA_Data * output;		// to point to the output stream
+	Revolution * revolution;	// to set to the instance sent by the host
+	unsigned long i;				// for the for loop
 	
 	revolution = (Revolution *) instance;
 	
+	// link the local pointers to their appropriate streams passed in through instance
 	input = revolution->Input;
 	output = revolution->Output;
 	
+	// for each sample, cut the value off at +/-0.67 if above or below +/-0.67.
 	for (i = 0; i < sample_count; ++i)
 	{
-		if (((float)abs(*input)) > 0.67)
+		if (*input > 0.67)
 		{
-			*(output++) = 0.67;
-			
+			(*output)++ = 0.67;
+			++input;
+		}
+		else if (*input < -0.67)
+		{
+			(*output)++ = -0.67;
+			++input;
 		}
 	}
 }
