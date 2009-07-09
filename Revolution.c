@@ -108,12 +108,16 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 	{
 		if (*input > 0.67)
 		{
-			(*output)++ = 0.67;
+			/*
+			 * NOTE: (*output)++ seems more intuitive, but the compiler will bark at
+			 * you for this ("lvalue required as left operand of assignment").
+			 */
+			*(output++) = 0.67;
 			++input;
 		}
 		else if (*input < -0.67)
 		{
-			(*output)++ = -0.67;
+			*(output++) = -0.67;
 			++input;
 		}
 	}
@@ -246,10 +250,10 @@ void _init()
 		temp_port_names = (char **) calloc(2, sizeof(char *));
 		
 		// set the name of the input port
-		temp_port_names[REVERSE_INPUT] = strdup("Input");
+		temp_port_names[REVOLUTION_INPUT] = strdup("Input");
 		
 		// set the name of the ouput port
-		temp_port_names[REVERSE_OUTPUT] = strdup("Output");
+		temp_port_names[REVOLUTION_OUTPUT] = strdup("Output");
 		
 		/*
 		 * set the instance PortNames array pointer to the location temp_port_names
@@ -271,8 +275,8 @@ void _init()
 		 * set the port hint descriptors (which are ints). Since this is a simple
 		 * distortion effect without control, input and ouput don't need any range hints.
 		 */
-		temp_hints[REVERSE_INPUT].HintDescriptor = 0;
-		temp_hints[REVERSE_OUTPUT].HintDescriptor = 0;
+		temp_hints[REVOLUTION_INPUT].HintDescriptor = 0;
+		temp_hints[REVOLUTION_OUTPUT].HintDescriptor = 0;
 		
 		/* set the instance PortRangeHints pointer to the location temp_hints
 		 * is pointed at.
