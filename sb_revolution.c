@@ -7,6 +7,9 @@
  *
  * This LADSPA plugin creates a fuzz distortion similar to The Beatles'
  * "Revolution".
+ *
+ * Thanks to Bart Massey for his direct help, Richard Furse for his examples,
+ * David Benson for his tutorial, and Dave Phillips for his ladspa information.
  */
 
 //----------------
@@ -29,7 +32,7 @@
 /*
  * Other constants
  */
-#define UNIQUE_ID 2009			// the plugin's unqique ID
+#define UNIQUE_ID 2009		// the plugin's unqique ID
 #define PORT_COUNT 2			// number of ports involved
 
 //--------------------------------
@@ -155,7 +158,7 @@ void cleanup_Revolution(LADSPA_Handle instance)
 
 
 /*
- * Global LADSPA_Descriptor variable used in _init(), get_ladpsa_descriptor(),
+ * Global LADSPA_Descriptor variable used in _init(), get_ladspa_descriptor(),
  * and _fini().
  */
 LADSPA_Descriptor * revolution_descriptor = NULL;
@@ -191,7 +194,7 @@ void _init()
 		 * assign the special property of the plugin, which is any of the three
        * defined in ladspa.h: LADSPA_PROPERTY_REALTIME, LADSPA_PROPERTY_INPLACE_BROKEN,
 		 * and LADSPA_PROPERTY_HARD_RT_CAPABLE.  They are just ints (1, 2, and 4,
-		 * respectively).  See ladpsa.h for what they actually mean.
+		 * respectively).  See ladspa.h for what they actually mean.
 		 */
 		revolution_descriptor->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		
@@ -316,8 +319,11 @@ void _init()
 /*
  * Returns a descriptor of the requested plugin type (there is only one plugin
  * type in this library).
+ *
+ * NOTE: this function MUST be called 'ladspa_descriptor' or else the plugin
+ * will not be recognized.
  */
-const LADSPA_Descriptor * get_ladpsa_descriptor(unsigned long index)
+const LADSPA_Descriptor * ladspa_descriptor(unsigned long index)
 {
 	if (index == 0)
 		return revolution_descriptor;

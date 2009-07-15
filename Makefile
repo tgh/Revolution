@@ -20,9 +20,8 @@
 #-----------------------------------------------------
 
 CC	=	gcc
-CFLAGS	=	-I -Wall -O3 -fPIC
-LINKER  =	ld
-LDFLAGS =	-shared
+CFLAGS	=	-Wall -O3 -fPIC
+LDFLAGS =	-nostartfiles -shared -Wl,-Bsymbolic # -lc -lm -lrt -lpthread
 LADSPA_PATH =	/usr/lib/ladspa		# change this variable to match
 					# your LADSPA_PATH environment
 					# variable (type 'echo $LADSPA_PATH'
@@ -33,12 +32,14 @@ PLUGINS	=	sb_revolution.so
 
 all: $(PLUGINS)
 
-sb_revolution.so: sb_revolution.c
+sb_revolution.o: sb_revolution.c
 	$(CC) $(CFLAGS) -c sb_revolution.c
-	$(LINKER) $(LDFLAGS) -o sb_revolution.so sb_revolution.o
+
+sb_revolution.so: sb_revolution.o
+	$(CC) $(LDFLAGS) -o sb_revolution.so sb_revolution.o
 
 install: sb_revolution.so
-	mv sb_revolution.so $(LADSPA_PATH)
+	cp sb_revolution.so $(LADSPA_PATH)
 
 uninstall:
 	rm -f $(LADSPA_PATH)/sb_*
