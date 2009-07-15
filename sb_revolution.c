@@ -29,7 +29,7 @@
 /*
  * Other constants
  */
-#define UNIQUE_ID 0			// the plugin's unqique ID
+#define UNIQUE_ID 2009			// the plugin's unqique ID
 #define PORT_COUNT 2			// number of ports involved
 
 //--------------------------------
