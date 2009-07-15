@@ -37,7 +37,7 @@ sb_revolution.so: sb_revolution.c
 	$(CC) $(CFLAGS) -c sb_revolution.c
 	$(LINKER) $(LDFLAGS) -o sb_revolution.so sb_revolution.o
 
-install:
+install: sb_revolution.so
 	mv sb_revolution.so $(LADSPA_PATH)
 
 uninstall:

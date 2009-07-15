@@ -26,6 +26,12 @@
 #define REVOLUTION_INPUT 0
 #define REVOLUTION_OUTPUT 1
 
+/*
+ * Other constants
+ */
+#define UNIQUE_ID 0			// the plugin's unqique ID
+#define PORT_COUNT 2			// number of ports involved
+
 //--------------------------------
 //-- STRUCT FOR PORT CONNECTION --
 //--------------------------------
@@ -95,15 +101,15 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 	LADSPA_Data * input;			// to point to the input stream
 	LADSPA_Data * output;		// to point to the output stream
 	Revolution * revolution;	// to set to the instance sent by the host
-	unsigned long i;				// for the for loop
-	
+
 	revolution = (Revolution *) instance;
-	
+
 	// link the local pointers to their appropriate streams passed in through instance
 	input = revolution->Input;
 	output = revolution->Output;
 	
 	// for each sample, cut the value off at +/-0.67 if above or below +/-0.67.
+	unsigned long i = 0;
 	for (i = 0; i < sample_count; ++i)
 	{
 		if (*input > 0.67)
@@ -171,7 +177,7 @@ void _init()
 	if (revolution_descriptor)
 	{
 		// assign the unique ID of the plugin given by ?
-		revolution_descriptor->UniqueID = 0;	// This will be changed later when I get an offical ID <------
+		revolution_descriptor->UniqueID = UNIQUE_ID;	// This will be changed later when I get an offical ID <------
 		
 		/*
 		 * assign the label of the plugin. since there are no control features for this
@@ -205,7 +211,7 @@ void _init()
 		 * assign the number of ports for the plugin.  since there are no control
 		 * features for Revolution, there are only 2 ports: audio input and output.
 		 */
-		revolution_descriptor->PortCount = 2;
+		revolution_descriptor->PortCount = PORT_COUNT;
 		
 		LADSPA_PortDescriptor * temp_descriptor_array;	// used for allocating and initailizing a
 																		// LADSPA_PortDescriptor array (which is
@@ -213,7 +219,7 @@ void _init()
 																		// PortDescriptors is a const *.
 		
 		// allocate space for the temporary array with a length of the number of ports (PortCount)
-		temp_descriptor_array = (LADSPA_PortDescriptor *) calloc(2, sizeof(LADSPA_PortDescriptor));
+		temp_descriptor_array = (LADSPA_PortDescriptor *) calloc(PORT_COUNT, sizeof(LADSPA_PortDescriptor));
 		
 		/*
 		 * set the port properties by ORing specific bit masks defined in ladspa.h.
@@ -247,7 +253,7 @@ void _init()
 											// revolution_descriptor->PortNames is a const char * const *.
 
 		// allocate the space for two port names
-		temp_port_names = (char **) calloc(2, sizeof(char *));
+		temp_port_names = (char **) calloc(PORT_COUNT, sizeof(char *));
 		
 		// set the name of the input port
 		temp_port_names[REVOLUTION_INPUT] = strdup("Input");
@@ -269,7 +275,7 @@ void _init()
 														// PortRangeHints is a const *.
 		
 		// allocate space for two port hints (see ladspa.h for info on 'hints')									
-		temp_hints = (LADSPA_PortRangeHint *) calloc(2, sizeof(LADSPA_PortRangeHint));
+		temp_hints = (LADSPA_PortRangeHint *) calloc(PORT_COUNT, sizeof(LADSPA_PortRangeHint));
 		
 		/*
 		 * set the port hint descriptors (which are ints). Since this is a simple
@@ -278,7 +284,8 @@ void _init()
 		temp_hints[REVOLUTION_INPUT].HintDescriptor = 0;
 		temp_hints[REVOLUTION_OUTPUT].HintDescriptor = 0;
 		
-		/* set the instance PortRangeHints pointer to the location temp_hints
+		/*
+		 * set the instance PortRangeHints pointer to the location temp_hints
 		 * is pointed at.
 		 */
 		revolution_descriptor->PortRangeHints = (const LADSPA_PortRangeHint *) temp_hints;
@@ -338,7 +345,7 @@ void _fini()
 		 * the for loop here is kind of unnecessary since the number of ports
 		 * was hard coded for this plugin as 2, but whatever.
 		 */
-		int i;
+		int i = 0;
 		for(i = 0; i < revolution_descriptor->PortCount; ++i)
 			free((char *)(revolution_descriptor->PortNames[i]));
 		
