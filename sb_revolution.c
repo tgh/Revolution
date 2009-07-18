@@ -32,7 +32,7 @@
 /*
  * Other constants
  */
-#define UNIQUE_ID 2009		// the plugin's unqique ID
+#define UNIQUE_ID 3000		// the plugin's unqique ID
 #define PORT_COUNT 2			// number of ports involved
 
 //--------------------------------
@@ -158,7 +158,7 @@ void cleanup_Revolution(LADSPA_Handle instance)
 
 
 /*
- * Global LADSPA_Descriptor variable used in _init(), get_ladspa_descriptor(),
+ * Global LADSPA_Descriptor variable used in _init(), ladspa_descriptor(),
  * and _fini().
  */
 LADSPA_Descriptor * revolution_descriptor = NULL;
@@ -192,7 +192,7 @@ void _init()
 		
 		/*
 		 * assign the special property of the plugin, which is any of the three
-       * defined in ladspa.h: LADSPA_PROPERTY_REALTIME, LADSPA_PROPERTY_INPLACE_BROKEN,
+		 * defined in ladspa.h: LADSPA_PROPERTY_REALTIME, LADSPA_PROPERTY_INPLACE_BROKEN,
 		 * and LADSPA_PROPERTY_HARD_RT_CAPABLE.  They are just ints (1, 2, and 4,
 		 * respectively).  See ladspa.h for what they actually mean.
 		 */
@@ -225,6 +225,12 @@ void _init()
 		temp_descriptor_array = (LADSPA_PortDescriptor *) calloc(PORT_COUNT, sizeof(LADSPA_PortDescriptor));
 		
 		/*
+		* set the instance LADSPA_PortDescriptor array (PortDescriptors) pointer to
+		* the location temp_descriptor_array is pointing at.
+		*/
+		revolution_descriptor->PortDescriptors = (const LADSPA_PortDescriptor *) temp_descriptor_array;
+		
+		/*
 		 * set the port properties by ORing specific bit masks defined in ladspa.h.
 		 *
 		 * this first one gives the first port the properties that tell the host that
@@ -240,12 +246,6 @@ void _init()
 		temp_descriptor_array[REVOLUTION_OUTPUT] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
 		
 		/*
-		 * set the instance LADSPA_PortDescriptor array (PortDescriptors) pointer to
-		 * the location temp_descriptor_array is pointing at.
-		 */
-		revolution_descriptor->PortDescriptors = (const LADSPA_PortDescriptor *) temp_descriptor_array;
-		
-		/*
 		 * set temp_descriptor_array to NULL for housekeeping--we don't need that local
 		 * variable anymore.
 		 */
@@ -258,17 +258,17 @@ void _init()
 		// allocate the space for two port names
 		temp_port_names = (char **) calloc(PORT_COUNT, sizeof(char *));
 		
+		/*
+		* set the instance PortNames array pointer to the location temp_port_names
+		* is pointing at.
+		*/
+		revolution_descriptor->PortNames = (const char **) temp_port_names;
+		
 		// set the name of the input port
 		temp_port_names[REVOLUTION_INPUT] = strdup("Input");
 		
 		// set the name of the ouput port
 		temp_port_names[REVOLUTION_OUTPUT] = strdup("Output");
-		
-		/*
-		 * set the instance PortNames array pointer to the location temp_port_names
-		 * is pointing at.
-		 */
-		revolution_descriptor->PortNames = (const char **) temp_port_names;
 		
 		// reset temp variable to NULL for housekeeping
 		temp_port_names = NULL;
@@ -281,17 +281,17 @@ void _init()
 		temp_hints = (LADSPA_PortRangeHint *) calloc(PORT_COUNT, sizeof(LADSPA_PortRangeHint));
 		
 		/*
+		* set the instance PortRangeHints pointer to the location temp_hints
+		* is pointed at.
+		*/
+		revolution_descriptor->PortRangeHints = (const LADSPA_PortRangeHint *) temp_hints;
+		
+		/*
 		 * set the port hint descriptors (which are ints). Since this is a simple
 		 * distortion effect without control, input and ouput don't need any range hints.
 		 */
 		temp_hints[REVOLUTION_INPUT].HintDescriptor = 0;
 		temp_hints[REVOLUTION_OUTPUT].HintDescriptor = 0;
-		
-		/*
-		 * set the instance PortRangeHints pointer to the location temp_hints
-		 * is pointed at.
-		 */
-		revolution_descriptor->PortRangeHints = (const LADSPA_PortRangeHint *) temp_hints;
 		
 		// reset temp variable to NULL for housekeeping
 		temp_hints = NULL;

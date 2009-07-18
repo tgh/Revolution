@@ -22,10 +22,12 @@
 CC	=	gcc
 CFLAGS	=	-Wall -O3 -fPIC
 LDFLAGS =	-nostartfiles -shared -Wl,-Bsymbolic # -lc -lm -lrt -lpthread
-LADSPA_PATH =	/usr/lib/ladspa		# change this variable to match
-					# your LADSPA_PATH environment
+
+LADSPA_PATH =	/usr/lib/ladspa		# change these 2 variables to match
+UNINSTALL = /usr/lib/ladspa/sb_*	# your LADSPA_PATH environment
 					# variable (type 'echo $LADSPA_PATH'
 					# at your shell prompt)
+
 PLUGINS	=	sb_revolution.so
 
 # ----------------------------------------------------
@@ -42,7 +44,7 @@ install: sb_revolution.so
 	cp sb_revolution.so $(LADSPA_PATH)
 
 uninstall:
-	rm -f $(LADSPA_PATH)/sb_*
+	rm -f $(UNINSTALL)
 
 clean:
 	rm -f *.o *.so
