@@ -139,21 +139,8 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
  */
 void cleanup_Revolution(LADSPA_Handle instance)
 {
-	Revolution * revolution;	// for a Revolution struct instance
-	
-	// cast the (void *) instance to (Revolution *) and set it to local pointer
-	revolution = (Revolution *) instance;
-	
-	if (revolution)
-	{
-		if (revolution->Input)
-			free(revolution->Input);
-		
-		if (revolution->Output)
-			free(revolution->Output);
-		
-		free(revolution);
-	}
+	if (instance)
+		free(instance);
 }
 
 
