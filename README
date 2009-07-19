@@ -1,0 +1,30 @@
+REVOLUTION
+----------
+July 19, 2009. Tyler Hayes. Portland, OR.
+
+Revolution is an audio plug-in using LADSPA (Linux Audio Developers Simple
+Programming API).  It's simple effect creates a fuzz distortion similar to
+that of The Beatles' "Revolution" where, in that case, guitars were plugged
+directly into the recording console and intentionally overloaded.
+
+It is written in C with much help from Bart Massey, Tom Szilagyi, David Benson,
+Dave Phillips, and Richard Furse--the source file(s) provide the official
+thanks and acknowledgements.
+
+This plug-in can be used with any audio program that supports LADSPA plug-ins.
+See your favorite audio program's specifications to see if it supports LADSPA
+plug-ins.  I used Audacity to test the plugin, but will most likely use Ardour
+as my primary audio tool.
+
+This is my first shot at writing a LADSPA plugin, which is why this one is so
+simple.  I'm not interested in this effect for usage, because distortion effects
+are a dime a dozen.  I only chose this effect to learn the API and get my feet
+wet.
+
+I am still a student programmer at the time of this writing, so the comments
+in the source code are detailed and directed at the beginner as well.  Hopefully
+the comments will be beneficial to those who were like me in learning the API,
+and not too annoying for the pro's out there.
+
+To install, make sure the LADSPA_PATH variable in the Makefile is correct to your
+environment, and just run (as root) make install.
