@@ -5,8 +5,8 @@
  * Please see the file COPYING in the source
  * distribution of this software for license terms.
  *
- * This LADSPA plugin creates a fuzz distortion similar to The Beatles'
- * "Revolution".
+ * This LADSPA plugin creates an overloaded fuzz distortion similar to The
+ * Beatles' "Revolution".
  *
  * Thanks to Bart Massey for his direct help, Richard Furse for his examples,
  * David Benson for his tutorial, and Dave Phillips for his ladspa information.
@@ -34,6 +34,13 @@
  */
 #define UNIQUE_ID 3000		// the plugin's unqique ID
 #define PORT_COUNT 2			// number of ports involved
+
+//-------------------------
+//-- FUNCTION PROTOTYPES --
+//-------------------------
+
+// calculates the average sample value of a given sample input stream
+LADSPA_Data average_Sample_Value(LADSPA_Data * input, unsigned long sample_count);
 
 //--------------------------------
 //-- STRUCT FOR PORT CONNECTION --
@@ -72,6 +79,7 @@ LADSPA_Handle instantiate_Revolution(const LADSPA_Descriptor * descriptor, unsig
 	return revolution;
 }
 
+//-----------------------------------------------------------------------------
 
 /*
  * Make a connection between a specified port and it's corresponding data location.
@@ -92,12 +100,13 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port, LADS
 		revolution->Output = data_location;
 }
 
+//-----------------------------------------------------------------------------
 
 /*
  * Here is where the rubber hits the road.  The actual sound manipulation
- * is done in run().  For Revolution, it merely takes each input sample, and
- * cuts it off at 0.67 (or -0.67) if it is above or below those thresholds,
- * thus "squaring off" the curved wave which produces distortion.
+ * is done in run().  For Revolution, it calculates the average of the samples
+ * sent in from the host and cuts off any sample if it is above or below
+ * +/- the average, thus "squaring off" the curved wave which produces distortion.
  */
 void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 {
@@ -111,27 +120,33 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 	input = revolution->Input;
 	output = revolution->Output;
 	
-	// for each sample, cut the value off at +/-0.67 if above or below +/-0.67.
+	// calculate the average sample value
+	LADSPA_Data avg_sample_val = average_Sample_Value(input, sample_count);
+	
+	// for each sample, cut the value off at +/- the average
 	unsigned long i = 0;
 	for (i = 0; i < sample_count; ++i)
 	{
-		if (*input > 0.67)
+		if (*input > avg_sample_val)
 		{
+			++input;
 			/*
 			 * NOTE: (*output)++ seems more intuitive, but the compiler will bark at
 			 * you for this ("lvalue required as left operand of assignment").
 			 */
-			*(output++) = 0.67;
-			++input;
+			*(output++) = avg_sample_val;
 		}
-		else if (*input < -0.67)
+		else if (*input < -avg_sample_val)
 		{
-			*(output++) = -0.67;
 			++input;
+			*(output++) = -avg_sample_val;
 		}
+		else
+			*(output++) = *(input++);
 	}
 }
 
+//-----------------------------------------------------------------------------
 
 /*
  * Frees dynamic memory associated with the Revolution instance.  The host
@@ -143,12 +158,14 @@ void cleanup_Revolution(LADSPA_Handle instance)
 		free(instance);
 }
 
+//-----------------------------------------------------------------------------
 
 /*
  * Global LADSPA_Descriptor variable used in _init(), ladspa_descriptor(),
  * and _fini().
  */
 LADSPA_Descriptor * revolution_descriptor = NULL;
+
 
 /*
  * The _init() function is called whenever this plugin is first loaded
@@ -302,6 +319,7 @@ void _init()
 	
 }
 
+//-----------------------------------------------------------------------------
 
 /*
  * Returns a descriptor of the requested plugin type (there is only one plugin
@@ -318,6 +336,7 @@ const LADSPA_Descriptor * ladspa_descriptor(unsigned long index)
 		return NULL;
 }
 
+//-----------------------------------------------------------------------------
 
 /*
  * This is called automatically by the host when it is done with this plugin.
@@ -348,3 +367,41 @@ void _fini()
 		free(revolution_descriptor);
 	}
 }
+
+//-----------------------------------------------------------------------------
+
+/*
+ * This function is called from run_Revolution().  It calculates the average
+ * value of all of the samples given from the host.
+ */
+LADSPA_Data average_Sample_Value(LADSPA_Data * input, unsigned long sample_count)
+{
+	LADSPA_Data total = 0;				// holds the running total of all sample values
+	LADSPA_Data * stream = input;		// use a local pointer to cycle through the input stream
+	
+	unsigned long i = 0;
+	for (i = 0; i < sample_count; ++i)
+	{
+		/*
+		 * you'll want the absolute value of the samples.  I could have used abs()
+		 * from math.h, but who cares.
+		 */
+		if (*stream < 0)
+			total += -(*(stream++));
+		else
+			total += *(stream++);
+	}
+	
+	/*
+	 * NOTE: there is a problem here.  A long variable, such as sample_count, is a
+	 * 64-bit integer, and a LADSPA_Data variable (a float) is a 32-bit variable.
+	 * If the value of the 64-bit variable is beyond the bounds of the 32-bit type,
+	 * then the 32-bit variable will get an unknown value when the 64-bit variable
+	 * is cast to the 32-bit type.  Will this situation ever occur in this host/
+	 * LADPSA plugin relationship?  I really don't know.  But it is dangerous total
+	 * perform a narrowing cast such as this.
+	 */
+	return (total / (LADSPA_Data) sample_count);
+}
+
+// EOF
