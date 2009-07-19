@@ -8,8 +8,14 @@
  * This LADSPA plugin creates an overloaded fuzz distortion similar to The
  * Beatles' "Revolution".
  *
- * Thanks to Bart Massey for his direct help, Richard Furse for his examples,
- * David Benson for his tutorial, and Dave Phillips for his ladspa information.
+ * Thanks to:
+ * - Bart Massey of Portland State University (http://web.cecs.pdx.edu/~bart/)
+ *   for his direct help
+ * - Richard Furse (http://www.muse.demon.co.uk/) for his examples
+ * - David Benson (http://gdam.ffem.org/ladspa-doc/ladspa.html) for his
+ *   tutorial
+ * - Dave Phillips (http://gdam.ffem.org/ladspa-doc/ladspa.html) for his
+ *   ladspa information
  */
 
 //----------------
@@ -107,6 +113,8 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port, LADS
  * is done in run().  For Revolution, it calculates the average of the samples
  * sent in from the host and cuts off any sample if it is above or below
  * +/- the average, thus "squaring off" the curved wave which produces distortion.
+ * Once the sample is cut-off, it is increased to half-way between the average
+ * and the maximum range (1.0 and -1.0).
  */
 void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 {
@@ -130,16 +138,20 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 		if (*input > avg_sample_val)
 		{
 			++input;
+			
 			/*
-			 * NOTE: (*output)++ seems more intuitive, but the compiler will bark at
-			 * you for this ("lvalue required as left operand of assignment").
+			 * Cut off the sample at the average sample value, and increase it to
+			 * the half-way point between the average and the maximim (1.0 or -1.0).
+			 *
+			 * NOTE: (*output)++ seems more intuitive, but the compiler will bark
+			 * at you for this ("lvalue required as left operand of assignment").
 			 */
-			*(output++) = avg_sample_val;
+			*(output++) = (1.0f + avg_sample_val) / 2.0f;
 		}
 		else if (*input < -avg_sample_val)
 		{
 			++input;
-			*(output++) = -avg_sample_val;
+			*(output++) = (-1.0f + -avg_sample_val) / 2.0f;
 		}
 		else
 			*(output++) = *(input++);
@@ -378,15 +390,30 @@ LADSPA_Data average_Sample_Value(LADSPA_Data * input, unsigned long sample_count
 {
 	LADSPA_Data total = 0;				// holds the running total of all sample values
 	LADSPA_Data * stream = input;		// use a local pointer to cycle through the input stream
+	unsigned long used_samples = sample_count;	// holds the number of samples actually
+																// used for the calculation
 	
 	unsigned long i = 0;
 	for (i = 0; i < sample_count; ++i)
 	{
 		/*
+		 * ignore any samples equal to zero, and reduce the amount of samples
+		 * to divide by later.  This will help the average from being too low.  For
+		 * example, if you have a sound clip that has a lot of silent lead time before
+		 * the sound comes in and you want to just apply this effect to the whole
+		 * thing rather than highlighting the actual sound, the average sample value
+		 * might be too low for your liking.
+		 */
+		if (*stream == 0.0f)
+		{
+			++stream;
+			--used_samples;
+		}
+		/*
 		 * you'll want the absolute value of the samples.  I could have used abs()
 		 * from math.h, but who cares.
 		 */
-		if (*stream < 0)
+		else if (*stream < 0.0f)
 			total += -(*(stream++));
 		else
 			total += *(stream++);
@@ -401,7 +428,7 @@ LADSPA_Data average_Sample_Value(LADSPA_Data * input, unsigned long sample_count
 	 * LADPSA plugin relationship?  I really don't know.  But it is dangerous total
 	 * perform a narrowing cast such as this.
 	 */
-	return (total / (LADSPA_Data) sample_count);
+	return (total / (LADSPA_Data) used_samples);
 }
 
 // EOF
