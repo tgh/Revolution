@@ -38,8 +38,10 @@
 /*
  * Other constants
  */
-#define UNIQUE_ID 3000		// the plugin's unqique ID
-#define PORT_COUNT 2			// number of ports involved
+// the plugin's unique ID given by Richard Furse (ladspa@muse.demon.co.uk)
+#define UNIQUE_ID 4301
+// number of ports involved
+#define PORT_COUNT 2
 
 //-------------------------
 //-- FUNCTION PROTOTYPES --
@@ -195,8 +197,8 @@ void _init()
 	// make sure malloc worked properly before initializing the struct fields
 	if (revolution_descriptor)
 	{
-		// assign the unique ID of the plugin given by ?
-		revolution_descriptor->UniqueID = UNIQUE_ID;	// This will be changed later when I get an offical ID <------
+		// assign the unique ID of the plugin given by Richard Furse
+		revolution_descriptor->UniqueID = UNIQUE_ID;
 		
 		/*
 		 * assign the label of the plugin. since there are no control features for this
