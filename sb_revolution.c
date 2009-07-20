@@ -76,7 +76,7 @@ typedef struct {
  * This function returns a LADSPA_Handle (which is a void * -- a pointer to
  * anything).
  */
-LADSPA_Handle instantiate_Revolution(const LADSPA_Descriptor * descriptor, unsigned long loc_sample_rate)
+LADSPA_Handle instantiate_Revolution()
 {
 	Revolution * revolution;	// for a Revolution struct instance
 	
@@ -330,7 +330,6 @@ void _init()
 		revolution_descriptor->deactivate = NULL;
 		revolution_descriptor->cleanup = cleanup_Revolution;
 	}
-	
 }
 
 //-----------------------------------------------------------------------------
