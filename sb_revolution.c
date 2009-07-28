@@ -129,7 +129,7 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 	// link the local pointers to their appropriate streams passed in through instance
 	input = revolution->Input;
 	output = revolution->Output;
-	
+
 	// calculate the average sample value
 	LADSPA_Data avg_sample_val = average_Sample_Value(input, sample_count);
 	
@@ -317,13 +317,7 @@ void _init()
 		// set the instance's function pointers to appropriate functions
 		revolution_descriptor->instantiate = instantiate_Revolution;
 		revolution_descriptor->connect_port = connect_port_to_Revolution;
-		
-		/*
-		 * activate is not needed because buffers are not used and thus don't
-		 * need to be cleared, which is what activate essentially does (I think?).
-		 */
 		revolution_descriptor->activate = NULL;
-		
 		revolution_descriptor->run = run_Revolution;
 		revolution_descriptor->run_adding = NULL;
 		revolution_descriptor->set_run_adding_gain = NULL;
