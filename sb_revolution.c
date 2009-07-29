@@ -220,7 +220,7 @@ void _init()
 		revolution_descriptor->Name = strdup("Revolution");
 		
 		// assign the author of the plugin
-		revolution_descriptor->Maker = strdup("Tyler Hayes");
+		revolution_descriptor->Maker = strdup("Tyler Hayes (tgh@pdx.edu)");
 		
 		/*
 		 * assign the copyright info of the plugin (NOTE: use "None" for no copyright
