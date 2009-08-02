@@ -120,9 +120,28 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port, LADS
  */
 void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 {
+	Revolution * revolution;	// to set to the instance sent by the host
+
+	/*
+	 * NOTE: these special cases should never happen, but you never know--like
+	 * if someone is developing a host program and it has some bugs in it, it
+	 * might pass some bad data.
+	 */
+	if (sample_count <= 0)
+	{
+		printf("\nPlugin received zero or negative samples.");
+		printf("\nPlugin not executed.\n");
+		return;
+	}
+	if (!revolution)
+	{
+		printf("\nPlugin received NULL pointer for plugin instance.");
+		printf("\nPlugin not executed.\n");
+		return;
+	}
+
 	LADSPA_Data * input;			// to point to the input stream
 	LADSPA_Data * output;		// to point to the output stream
-	Revolution * revolution;	// to set to the instance sent by the host
 
 	revolution = (Revolution *) instance;
 
