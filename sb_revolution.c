@@ -120,7 +120,7 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port, LADS
  */
 void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 {
-	Revolution * revolution;	// to set to the instance sent by the host
+	Revolution * revolution = (Revolution *) instance;
 
 	/*
 	 * NOTE: these special cases should never happen, but you never know--like
@@ -142,8 +142,6 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
 
 	LADSPA_Data * input;			// to point to the input stream
 	LADSPA_Data * output;		// to point to the output stream
-
-	revolution = (Revolution *) instance;
 
 	// link the local pointers to their appropriate streams passed in through instance
 	input = revolution->Input;
