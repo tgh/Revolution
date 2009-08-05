@@ -20,7 +20,7 @@ See your favorite audio program's specifications to see if it supports LADSPA
 plug-ins.  I used Audacity to test the plugin, but will most likely use Ardour
 as my primary audio tool.
 
-This is my first shot at writing a LADSPA plugin, which is why this one is so
+This was my first shot at writing a LADSPA plugin, which is why this one is so
 simple.  I'm not interested in this effect for usage, because distortion effects
 are a dime a dozen.  I only chose this effect to learn the API and get my feet
 wet.
