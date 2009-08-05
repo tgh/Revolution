@@ -14,8 +14,8 @@
  * - Richard Furse (http://www.muse.demon.co.uk/) for his examples
  * - David Benson (http://gdam.ffem.org/ladspa-doc/ladspa.html) for his
  *   tutorial
- * - Dave Phillips (http://gdam.ffem.org/ladspa-doc/ladspa.html) for his
- *   ladspa information
+ * - Dave Phillips(http://linuxdevcenter.com/pub/a/linux/2001/02/02/ladspa.html)
+ *   for his ladspa information
  */
 
 //----------------
