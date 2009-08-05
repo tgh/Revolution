@@ -1,6 +1,8 @@
 REVOLUTION (part of the StudioBlood LADSPA plugin package, hence the sb_ prefix)
-----------
-July 19, 2009. Tyler Hayes. Portland, OR.
+COPYRIGHT (c)2009. Tyler Hayes. Portland, OR. July 19, 2009.
+-------
+
+Yhis LADSPA plugin is licensed under the GPL v3.
 
 Revolution is an audio plug-in using LADSPA (Linux Audio Developers Simple
 Programming API).  It's simple effect creates a fuzz distortion similar to
@@ -26,5 +28,6 @@ in the source code are detailed and directed at the beginner as well.  Hopefully
 the comments will be beneficial to those who were like me in learning the API,
 and not too annoying for the pro's out there.
 
-To install, make sure the LADSPA_PATH variable in the Makefile is correct to your
-environment, and just run (as root) make install.
+To install, make sure the LADSPA_PATH variable in the Makefile is correct to
+your environment, and just run (as root) 'make install'.  You can also run
+'make uninstall' (again, as root) to remove the plugin.
