@@ -437,7 +437,7 @@ LADSPA_Data average_Sample_Value(LADSPA_Data * input, unsigned long sample_count
 	 * If the value of the 64-bit variable is beyond the bounds of the 32-bit type,
 	 * then the 32-bit variable will get an unknown value when the 64-bit variable
 	 * is cast to the 32-bit type.  Will this situation ever occur in this host/
-	 * LADPSA plugin relationship?  I really don't know.  But it is dangerous total
+	 * LADSPA plugin relationship?  I really don't know.  But it is dangerous to
 	 * perform a narrowing cast such as this.
 	 */
 	return (total / (LADSPA_Data) used_samples);
