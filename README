@@ -1,8 +1,10 @@
 REVOLUTION (part of the StudioBlood LADSPA plugin package, hence the sb_ prefix)
 COPYRIGHT (c)2009. Tyler Hayes. Portland, OR. July 19, 2009.
+ALL RIGHTS RESERVED.
+
 -------
 
-Yhis LADSPA plugin is licensed under the GPL v3.
+This LADSPA plugin is licensed under the GPL v3.
 
 Revolution is an audio plug-in using LADSPA (Linux Audio Developers Simple
 Programming API).  It's simple effect creates a fuzz distortion similar to
