@@ -269,16 +269,17 @@ void _init() {
                                                   LADSPA_PORT_AUDIO;
 
         /*
-         * this gives the second port the properties that tell the host that this port is
-         * an output port and that it is an audio port (I don't see any situation where
-         * one might be an output port, but not an audio port...).
+         * this gives the second port the properties that tell the host that
+         * this port is an output port and that it is an audio port (I don't see
+         * any situation where one might be an output port, but not an audio
+         * port...).
          */
         temp_descriptor_array[REVOLUTION_OUTPUT] = LADSPA_PORT_OUTPUT |
                                                    LADSPA_PORT_AUDIO;
 
         /*
-         * set temp_descriptor_array to NULL for housekeeping--we don't need that local
-         * variable anymore.
+         * set temp_descriptor_array to NULL for housekeeping--we don't need
+         * that local variable anymore.
          */
         temp_descriptor_array = NULL;
 
