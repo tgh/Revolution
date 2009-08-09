@@ -144,22 +144,14 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count) {
     // for each sample, cut the value off at +/- the average
     unsigned long i = 0;
     for (i = 0; i < sample_count; ++i) {
+        // set the sample value to the average value if it is above the average
+        // (or below the negative average), otherwise just copy the sample
         if (*input > avg_sample_val) {
             ++input;
-
-            /*
-             * Cut off the sample at the average sample value, and increase it
-             * to the half-way point between the average and the maximim (1.0
-             * or -1.0).
-             *
-             * NOTE: (*output)++ seems more intuitive, but the gcc compiler will
-             * bark at you for this ("lvalue required as left operand of
-             * assignment").
-             */
-            *(output++) = (1.0f + avg_sample_val) / 2.0f;
+            *(output++) = avg_sample_val;
         } else if (*input < -avg_sample_val) {
             ++input;
-            *(output++) = (-1.0f + -avg_sample_val) / 2.0f;
+            *(output++) = -avg_sample_val;
         } else
             *(output++) = *(input++);
     }
@@ -168,8 +160,7 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count) {
 //-----------------------------------------------------------------------------
 
 /*
- * Frees dynamic memory associated with the Revolution instance.  The host
- * better send the right pointer in or there's gonna be a leak!
+ * Frees dynamic memory associated with the Revolution instance.
  */
 void cleanup_Revolution(LADSPA_Handle instance) {
     if (instance)
