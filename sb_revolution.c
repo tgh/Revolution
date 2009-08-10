@@ -55,7 +55,9 @@ LADSPA_Data average_Sample_Value(LADSPA_Data * input,
 //-- STRUCT FOR PORT CONNECTION --
 //--------------------------------
 
-typedef struct {
+
+typedef struct
+{
     // data locations for the input & output audio ports
     LADSPA_Data * Input;
     LADSPA_Data * Output;
@@ -65,12 +67,14 @@ typedef struct {
 //-- FUNCTIONS --
 //---------------
 
+
 /*
  * Creates a Revolution plugin instance by allocating space for a plugin handle.
  * This function returns a LADSPA_Handle (which is a void * -- a pointer to
  * anything).
  */
-LADSPA_Handle instantiate_Revolution() {
+LADSPA_Handle instantiate_Revolution()
+{
     Revolution * revolution; // for a Revolution struct instance
 
     // allocate space for a Revolution struct instance
@@ -82,13 +86,15 @@ LADSPA_Handle instantiate_Revolution() {
 
 //-----------------------------------------------------------------------------
 
+
 /*
  * Make a connection between a specified port and it's corresponding data
  * location. For example, the output port should be "connected" to the place in
  * memory where that sound data to be played is located.
  */
 void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port,
-                                LADSPA_Data * data_location) {
+                                LADSPA_Data * data_location)
+{
     Revolution * revolution; // for a Revolution struct instance
 
     // cast the (void *) instance to (Revolution *) and set it to local pointer
@@ -103,6 +109,7 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port,
 
 //-----------------------------------------------------------------------------
 
+
 /*
  * Here is where the rubber hits the road.  The actual sound manipulation
  * is done in run().  For Revolution, it calculates the average of the samples
@@ -111,7 +118,8 @@ void connect_port_to_Revolution(LADSPA_Handle instance, unsigned long Port,
  * distortion. Once the sample is cut-off, it is increased to half-way between
  * the average and the maximum range (1.0 and -1.0).
  */
-void run_Revolution(LADSPA_Handle instance, unsigned long sample_count) {
+void run_Revolution(LADSPA_Handle instance, unsigned long sample_count)
+{
     Revolution * revolution = (Revolution *) instance;
 
     /*
@@ -119,12 +127,14 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count) {
      * if someone is developing a host program and it has some bugs in it, it
      * might pass some bad data.
      */
-    if (sample_count <= 0) {
+    if (sample_count <= 0)
+    {
         printf("\nPlugin received zero or negative samples.");
         printf("\nPlugin not executed.\n");
         return;
     }
-    if (!revolution) {
+    if (!revolution)
+    {
         printf("\nPlugin received NULL pointer for plugin instance.");
         printf("\nPlugin not executed.\n");
         return;
@@ -143,26 +153,33 @@ void run_Revolution(LADSPA_Handle instance, unsigned long sample_count) {
 
     // for each sample, cut the value off at +/- the average
     unsigned long i = 0;
-    for (i = 0; i < sample_count; ++i) {
+    for (i = 0; i < sample_count; ++i)
+    {
         // set the sample value to the average value if it is above the average
         // (or below the negative average), otherwise just copy the sample
-        if (*input > avg_sample_val) {
+        if (*input > avg_sample_val)
+        {
             ++input;
             *(output++) = avg_sample_val;
-        } else if (*input < -avg_sample_val) {
+        }
+        else if (*input < -avg_sample_val)
+        {
             ++input;
             *(output++) = -avg_sample_val;
-        } else
+        }
+        else
             *(output++) = *(input++);
     }
 }
 
 //-----------------------------------------------------------------------------
 
+
 /*
  * Frees dynamic memory associated with the Revolution instance.
  */
-void cleanup_Revolution(LADSPA_Handle instance) {
+void cleanup_Revolution(LADSPA_Handle instance)
+{
     if (instance)
         free(instance);
 }
@@ -175,21 +192,24 @@ void cleanup_Revolution(LADSPA_Handle instance) {
  */
 LADSPA_Descriptor * revolution_descriptor = NULL;
 
+
 /*
  * The _init() function is called whenever this plugin is first loaded
  * by the host using it.
  */
-void _init() {
+void _init()
+{
     /*
      * allocate memory for revolution_descriptor (it's just a pointer at this
      * point). In other words create an actual LADSPA_Descriptor struct instance
      * that revolution_descriptor will point to.
      */
     revolution_descriptor = (LADSPA_Descriptor *)
-                            malloc(sizeof (LADSPA_Descriptor));
+            malloc(sizeof (LADSPA_Descriptor));
 
     // make sure malloc worked properly before initializing the struct fields
-    if (revolution_descriptor) {
+    if (revolution_descriptor)
+    {
         // assign the unique ID of the plugin given by Richard Furse
         revolution_descriptor->UniqueID = UNIQUE_ID;
 
@@ -240,14 +260,14 @@ void _init() {
         // allocate space for the temporary array with a length of the number
         // of ports (PortCount)
         temp_descriptor_array = (LADSPA_PortDescriptor *)
-                            calloc(PORT_COUNT, sizeof (LADSPA_PortDescriptor));
+                calloc(PORT_COUNT, sizeof (LADSPA_PortDescriptor));
 
         /*
          * set the instance LADSPA_PortDescriptor array (PortDescriptors)
          * pointer to the location temp_descriptor_array is pointing at.
          */
         revolution_descriptor->PortDescriptors = (const LADSPA_PortDescriptor *)
-                                                 temp_descriptor_array;
+                temp_descriptor_array;
 
         /*
          * set the port properties by ORing specific bit masks defined in
@@ -257,7 +277,7 @@ void _init() {
          * that this port takes input and is an audio port (not a control port).
          */
         temp_descriptor_array[REVOLUTION_INPUT] = LADSPA_PORT_INPUT |
-                                                  LADSPA_PORT_AUDIO;
+                LADSPA_PORT_AUDIO;
 
         /*
          * this gives the second port the properties that tell the host that
@@ -266,7 +286,7 @@ void _init() {
          * port...).
          */
         temp_descriptor_array[REVOLUTION_OUTPUT] = LADSPA_PORT_OUTPUT |
-                                                   LADSPA_PORT_AUDIO;
+                LADSPA_PORT_AUDIO;
 
         /*
          * set temp_descriptor_array to NULL for housekeeping--we don't need
@@ -305,14 +325,14 @@ void _init() {
 
         // allocate space for two port hints (see ladspa.h for info on 'hints')
         temp_hints = (LADSPA_PortRangeHint *)
-                     calloc(PORT_COUNT, sizeof (LADSPA_PortRangeHint));
+                calloc(PORT_COUNT, sizeof (LADSPA_PortRangeHint));
 
         /*
          * set the instance PortRangeHints pointer to the location temp_hints
          * is pointed at.
          */
         revolution_descriptor->PortRangeHints = (const LADSPA_PortRangeHint *)
-                                                temp_hints;
+                temp_hints;
 
         /*
          * set the port hint descriptors (which are ints). Since this is a
@@ -339,6 +359,7 @@ void _init() {
 
 //-----------------------------------------------------------------------------
 
+
 /*
  * Returns a descriptor of the requested plugin type (there is only one plugin
  * type in this library).
@@ -346,7 +367,8 @@ void _init() {
  * NOTE: this function MUST be called 'ladspa_descriptor' or else the plugin
  * will not be recognized.
  */
-const LADSPA_Descriptor * ladspa_descriptor(unsigned long index) {
+const LADSPA_Descriptor * ladspa_descriptor(unsigned long index)
+{
     if (index == 0)
         return revolution_descriptor;
     else
@@ -355,13 +377,16 @@ const LADSPA_Descriptor * ladspa_descriptor(unsigned long index) {
 
 //-----------------------------------------------------------------------------
 
+
 /*
  * This is called automatically by the host when it is done with this plugin.
  * (When this dynamic library is unloaded).  It frees all dynamically
  * allocated memory associated with the descriptor.
  */
-void _fini() {
-    if (revolution_descriptor) {
+void _fini()
+{
+    if (revolution_descriptor)
+    {
         free((char *) revolution_descriptor->Label);
         free((char *) revolution_descriptor->Name);
         free((char *) revolution_descriptor->Maker);
@@ -385,12 +410,14 @@ void _fini() {
 
 //-----------------------------------------------------------------------------
 
+
 /*
  * This function is called from run_Revolution().  It calculates the average
  * value of all of the samples given from the host.
  */
 LADSPA_Data average_Sample_Value(LADSPA_Data * input,
-                                 unsigned long sample_count) {
+                                 unsigned long sample_count)
+{
 
     // holds the running total of all sample values
     LADSPA_Data total = 0;
@@ -400,7 +427,8 @@ LADSPA_Data average_Sample_Value(LADSPA_Data * input,
     unsigned long used_samples = sample_count;
 
     unsigned long i = 0;
-    for (i = 0; i < sample_count; ++i) {
+    for (i = 0; i < sample_count; ++i)
+    {
         /*
          * ignore any samples equal to zero, and reduce the amount of samples
          * to divide by later.  This will help the average from being too low.
@@ -409,15 +437,16 @@ LADSPA_Data average_Sample_Value(LADSPA_Data * input,
          * to the whole thing rather than highlighting the actual sound, the
          * average sample value might be too low for your liking.
          */
-        if (*stream == 0.0f) {
+        if (*stream == 0.0f)
+        {
             ++stream;
             --used_samples;
         }
 
-        /*
-         * you'll want the absolute value of the samples.  I could have used
-         * abs() from math.h, but who cares.
-         */
+            /*
+             * you'll want the absolute value of the samples.  I could have used
+             * abs() from math.h, but who cares.
+             */
         else if (*stream < 0.0f)
             total += -(*(stream++));
         else
