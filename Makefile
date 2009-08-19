@@ -28,7 +28,7 @@ PLUGINS	=	sb_revolution.so
 
 all: $(PLUGINS)
 
-sb_revolution.o: sb_revolution.c ../ladspa.h
+sb_revolution.o: sb_revolution.c
 	$(CC) $(CFLAGS) -c sb_revolution.c
 
 sb_revolution.so: sb_revolution.o
